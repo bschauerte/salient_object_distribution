@@ -1,13 +1,21 @@
 function pval = spiegelhaltertest(x)
-  % compute pvalue under null of x normally distributed;
-  % x should be a vector;
+  % SPIEGELHALTERTEST implements Spiegelhalter's test against a Gaussian
+  %   distribution, see D. J. Spiegelhalter, "Diagnostic tests of 
+  %   distributional shape," Biometrika, 1983
   %
-  % taken from Stackoverflow, if I recall correctly
+  % Input:  x should be a vector
+  % Output: p-value under null of x normally distributed
+  % 
+  % Original code taken from Stackoverflow (authored bz shabbychef)
+  %
+  % @author: B. Schauerte
+  % @date:   2012
+
   xm = mean(x);
   xs = std(x);
   xz = (x - xm) ./ xs;
   xz2 = xz.^2;
   N = sum(xz2 .* log(xz2));
   n = numel(x);
-  ts = (N - 0.73 * n) / (0.8969 * sqrt(n)); %under the null, ts ~ N(0,1)
-  pval = 1 - abs(erf(ts / sqrt(2)));    %2-sided test.
+  ts = (N - 0.73 * n) / (0.8969 * sqrt(n));
+  pval = 1 - abs(erf(ts / sqrt(2)));

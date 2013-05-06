@@ -5,7 +5,9 @@
 % Please see [1] for details and an application of the findings. Be so kind
 % to cite [1], if you use the provided code.
 %
-% [1] ... ICIP ...
+%   [1] B. Schauerte, R. Stiefelhagen, "How the Distribution of Salient
+%       Objects in Images Influences Salient Object Detection". In Proceedings
+%       of the 20th International Conference on Image Processing (ICIP), 2013.
 %
 % @author: B. Schauerte
 % @date:   2012-2013
@@ -53,6 +55,23 @@ if ~exist('maskpath','var')
     maskpath='/Users/bschauer/data/salient-objects/achanta/binarymasks/';
   else
     maskpath='/home/bschauer/data/salient-objects/achanta/binarymasks/'; % from Achanta
+  end
+end
+
+%% Download the data, if necessary
+if ~exist(maskpath)
+  maskpath = 'binarymasks'; % did we, maybe, already download and locally setup a copy of the dataset?
+end
+if ~exist(maskpath)
+  urlwrite('http://cvhci.anthropomatik.kit.edu/~bschauer/datasets/achanta_binary_masks.zip','binarymasks.zip');
+  try
+    unzip('binarymasks.zip');
+  catch err
+    % @NOTE: If you have trouble unzipping, then you might want to upgrade
+    %        the (un-)zip command. The package is fine, but some versions
+    %        of unzip seem to have trouble (Matlab 2012b on Mac OS X for
+    %        example)
+    error('Could not find or downloads Achanta''s dataset.')
   end
 end
 
@@ -189,7 +208,7 @@ if isempty(which('circ_rtest'))
 else  
   fprintf('Testing angles vs circular\n');
   figure('name','centroid angles');
-  circ_plot(angles_centroids)
+  circ_plot(angles_centroids);
   [p z]=circ_rtest(angles_centroids);
   H = p < 0.05;
   fprintf('  test=%s (vs %s) H=%d p=%f\n','R-test','uniform',H,p);
