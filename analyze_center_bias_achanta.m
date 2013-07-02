@@ -71,7 +71,7 @@ if ~exist(maskpath)
     %        the (un-)zip command. The package is fine, but some versions
     %        of unzip seem to have trouble (Matlab 2012b on Mac OS X for
     %        example)
-    error('Could not find or downloads Achanta''s dataset.')
+    error('Could not find or download Achanta''s dataset.')
   end
 end
 
