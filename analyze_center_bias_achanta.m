@@ -44,8 +44,32 @@
 % official policies, either expressed or implied, of B. Schauerte.
 
 %% (optional) libraries
-if isempty(which('randraw')), addpath(genpath('../libs/randraw/')); end
-if isempty(which('circ_rtest')), addpath(genpath('../libs/circstat/')); end
+if isempty(which('randraw'))
+    if ~exist('libs/randraw/')
+        fprintf('Installing the randraw library ...')
+        if ~exist('libs')
+            mkdir('libs');
+        end
+        urlwrite('http://www.mathworks.com/matlabcentral/fileexchange/7309-randraw?download=true','libs/randraw.zip');
+        unzip('libs/randraw.zip','libs/randraw');
+        fprintf('done\n')
+    end
+    addpath(genpath('libs/randraw/'));
+end
+if isempty(which('circ_rtest'))
+    if ~exist('libs/circstat/')
+        fprintf('Installing the circstat library ...')
+        if ~exist('libs')
+            mkdir('libs');
+        end
+        urlwrite('http://www.mathworks.com/matlabcentral/fileexchange/10676-circular-statistics-toolbox-directional-statistics?download=true','libs/circstat.zip');
+        unzip('libs/circstat.zip','libs/circstat');
+        fprintf('done\n')
+    end
+    addpath(genpath('libs/circstat/')); 
+end
+% if isempty(which('randraw')), addpath(genpath('libs/randraw/')); end
+% if isempty(which('circ_rtest')), addpath(genpath('libs/circstat/')); end
 
 %% Set path to Achanta's dataset (we only need the binary masks)
 if ~exist('maskpath','var')
@@ -191,8 +215,8 @@ fprintf('  test=%s (vs %s) H=%d p=%f\n','Chi-Square','uniform',H,p);
 fprintf('  test=%s (vs %s) H=%d p=%f\n','Chi-Square','normal',H,p);
 [H,p,stats]=chi2gof(angles_centroids,'cdf',@expcdf,'alpha',alpha_value); % exponential distribution
 fprintf('  test=%s (vs %s) H=%d p=%f\n','Chi-Square','exponential',H,p);
-[H,p,stats]=chi2gof(angles_centroids,'cdf',poisscdf,'alpha',alpha_value); % exponential distribution
-fprintf('  test=%s (vs %s) H=%d p=%f\n','Chi-Square','poisson',H,p);
+%[H,p,stats]=chi2gof(angles_centroids,'cdf',poisscdf,'alpha',alpha_value); % poisson distribution
+%fprintf('  test=%s (vs %s) H=%d p=%f\n','Chi-Square','poisson',H,p);
 [H,p,stats]=chi2gof(angles_centroids,'cdf',tcdf,'alpha',alpha_value); % exponential distribution
 fprintf('  test=%s (vs %s) H=%d p=%f\n','Chi-Square','students t',H,p);
 [H,p,stats]=chi2gof(angles_centroids,'cdf',cauchycdf,'alpha',alpha_value); % Cauchy distribution
@@ -301,7 +325,7 @@ fprintf('Correlation coefficient of Angles vs Uniform:     %f > %f\n',cc(2),0.88
 %   1000        1.32        0.888
 fprintf('--\n');
 cc=corrcoef(angles_centroids_percentiles,normal_percentiles);
-fprintf('Correlation coefficient of Angles vs Normal:      %f < %f\n',cc(2),0.888);
+fprintf('Correlation coefficient of Angles vs Normal:      %f\n',cc(2)); % < %f\n',cc(2),0.888);
 cc=corrcoef(angles_centroids_percentiles,lognormal_percentiles);
 fprintf('Correlation coefficient of Angles vs LogNormal:   %f\n',cc(2));
 cc=corrcoef(angles_centroids_percentiles,weibull_percentiles);
@@ -338,26 +362,3 @@ cc=corrcoef(transformed_radius_centroids_percentiles,tri_precentiles);
 fprintf('Correlation coefficient of Transformed Radii vs Triangular:  %f\n',cc(2));
 cc=corrcoef(transformed_radius_centroids_percentiles,cauchy_percentiles);
 fprintf('Correlation coefficient of Transformed Radii vs Cauchy:      %f\n',cc(2));
-
-% %% For a given distribution with parameters: Calculate the maximum plot correlation
-% parameter_values=[0.001:0.01:1];
-% %parameter_values=[1:1:100];
-% cc_values=zeros(numel(parameter_values),1);
-% %target_quantiles=transformed_radius_centroids_percentiles;
-% target_quantiles=transformed_radius_centroids_percentiles;
-% for i=1:numel(parameter_values)
-%   %test_percentiles=prctile(randraw('weibull', [0 parameter_values(i) 1], N), pvec);%prctile(randraw('exp', [parameter_values(i)], N), pvec);
-%   %test_percentiles=prctile(randraw('cauchy', [0 parameter_values(i)], N), pvec);%prctile(randraw('exp', [parameter_values(i)], N), pvec);
-%   test_percentiles=prctile(randraw('cauchy', [0 parameter_values(i)], N), pvec);%prctile(randraw('exp', [parameter_values(i)], N), pvec);
-%   cc=corrcoef(target_quantiles,test_percentiles);
-%   cc_values(i) = cc(2);
-% end
-% figure('name',['PPCC (max=' num2str(max(cc_values)) ')']), plot(cc_values);
-
-% %% Analyse the tail in the truncated normal distribution plot
-% [sorted_radius_centroids_normalized I]=sort(radius_centroids_normalized);
-% threshold=0.51;
-% thresholded_radius_centroids_normalized=sorted_radius_centroids_normalized(sorted_radius_centroids_normalized < threshold);
-% numel(sorted_radius_centroids_normalized)-numel(thresholded_radius_centroids_normalized)
-% figure, qqplot(thresholded_radius_centroids_normalized,randraw('normaltrunc',[0,Inf,0,1],numel(radius_centroids_normalized)*20))
-% figure, qqplot(thresholded_radius_centroids_normalized,randraw('normaltrunc',[0,2.5,0,1],numel(radius_centroids_normalized)*20))
